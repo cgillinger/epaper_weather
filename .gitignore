@@ -41,3 +41,5 @@ node_modules/
 *.exe
 *.o
 *.a
+# Ignore local changes in the e-Paper submodule
+/e-Paper
