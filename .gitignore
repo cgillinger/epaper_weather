@@ -1,0 +1,25 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+.venv/
+env/
+venv/
+
+# OS-filer
+.DS_Store
+Thumbs.db
+
+# Loggar
+*.log
+
+# Projekt-specifikt
+config.json
+sun_cache.json
+pressure_history.json
+
+# Eventuella testutdata
+*.tmp
+*.bak

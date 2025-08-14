@@ -1,0 +1,16 @@
+{
+  "temperature": 23.9,
+  "weather_symbol": 8,
+  "weather_description": "Lätta regnskurar",
+  "pressure": 1005.1,
+  "pressure_trend_text": "Stabilt",
+  "pressure_trend_arrow": "stable",
+  "tomorrow_temp": 24.8,
+  "tomorrow_symbol": 3,
+  "tomorrow_desc": "Växlande molnighet",
+  "sunrise": "2025-07-26T04:18:00",
+  "sunset": "2025-07-26T21:28:00",
+  "date": "2025-07-26",
+  "last_display_update": 1753536612.4456758,
+  "cached_at": "2025-07-26T15:30:12.445678"
+}

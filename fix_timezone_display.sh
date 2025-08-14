@@ -1,0 +1,51 @@
+#!/bin/bash
+echo "🕐 FIXAR TIMEZONE-VISNING I CYKEL-VÄDER"
+echo "======================================="
+
+echo ""
+echo "🐛 PROBLEMET:"
+echo "SMHI returnerar UTC-tider men visar dem som lokala tider"
+echo "19:00 UTC = 21:00 CEST (svensk sommartid)"
+echo "Användaren ser '19:00' men det betyder faktiskt '21:00' lokal tid"
+echo ""
+
+echo "💡 LÖSNINGEN:"
+echo "Konvertera SMHI UTC-tider till lokal tid innan visning"
+echo "warning_forecast_time.strftime('%H:%M') → lokaltid"
+echo ""
+
+echo "🔒 BACKUP weather_client.py:"
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="backup/timezone_fix_$TIMESTAMP"
+mkdir -p "$BACKUP_DIR"
+cp modules/weather_client.py "$BACKUP_DIR/"
+echo "✅ Backup: $BACKUP_DIR/weather_client.py"
+echo ""
+
+echo "🎯 FÖRKLARAD BUGG:"
+echo "Med nuvarande visning:"
+echo "  Skärm visar: 'startar 19:00'"  
+echo "  Användaren: 'Det är 19:41, varför 19:00?'"
+echo "  Realitet: '19:00 UTC = 21:00 svensk tid'"
+echo ""
+
+echo "Efter fix:"
+echo "  Skärm visar: 'startar 21:00'"
+echo "  Användaren: 'Ah, regn väntat om 1h 19min'"
+echo ""
+
+echo "🔧 ÄNDRING BEHÖVS I modules/weather_client.py:"
+echo "I analyze_cycling_weather() funktionen, runt rad ~400:"
+echo ""
+echo "FRÅN:"
+echo "cycling_analysis['forecast_time'] = warning_forecast_time.strftime('%H:%M')"
+echo ""
+echo "TILL:"
+echo "# Konvertera UTC till lokal tid för visning"
+echo "local_time = warning_forecast_time.astimezone()"
+echo "cycling_analysis['forecast_time'] = local_time.strftime('%H:%M')"
+echo ""
+
+echo "🎯 Detta förklarar också varför systemet 'inte rättade sig':"
+echo "Systemet FUNGERAR korrekt - det prognostiserar regn 21:00 lokal tid"
+echo "Men visar fel tid (19:00 UTC istället för 21:00 lokal)"

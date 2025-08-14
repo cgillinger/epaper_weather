@@ -1,0 +1,26 @@
+[4.0K]  .
+├── [4.0K]  assets
+│   └── [4.0K]  fonts
+├── [4.0K]  cache
+│   ├── [1.5K]  pressure_history.json
+│   └── [2.6K]  sun_cache.json
+├── [2.3K]  config.json
+├── [ 33K]  convert_svg_high_res.py
+├── [4.0K]  fonts
+├── [4.0K]  icons
+│   ├── [4.0K]  pressure
+│   ├── [4.0K]  sun
+│   ├── [4.0K]  system
+│   └── [ 12K]  weather
+├── [4.0K]  logs
+│   └── [164K]  weather.log
+├── [ 36K]  main.py
+├── [4.0K]  modules
+│   ├── [ 25K]  icon_manager.py
+│   ├── [ 17K]  sun_calculator.py
+│   └── [ 33K]  weather_client.py
+├── [   0]  project_structure_detailed.txt
+├── [6.6K]  screenshot.py
+└── [ 12K]  screenshots
+
+13 directories, 11 files
