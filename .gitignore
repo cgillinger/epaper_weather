@@ -1,25 +1,43 @@
-# Python cache
+# Bytecode och cache
 __pycache__/
 *.py[cod]
-*.pyo
+*$py.class
 
-# Virtual environments
+# OS-specifika filer
+.DS_Store
+Thumbs.db
+
+# Loggar och databaser
+*.log
+*.sqlite3
+*.db
+
+# Miljö- och konfigfiler (tokens, API-nycklar m.m.)
+config.json
+.env
+*.env
+
+# Backup- och temporära filer
+*.bak
+*.tmp
+*.swp
+~$*
+
+# JSON-data som inte är kod (cache, historik, mätdata)
+pressure_history.json
+sun_cache.json
+
+# Virtuella miljöer
 .venv/
 env/
 venv/
 
-# OS-filer
-.DS_Store
-Thumbs.db
+# Node-modules om projektet får frontend-del senare
+node_modules/
 
-# Loggar
-*.log
-
-# Projekt-specifikt
-config.json
-sun_cache.json
-pressure_history.json
-
-# Eventuella testutdata
-*.tmp
-*.bak
+# Kompilerade objekt- och binärfiler
+*.so
+*.dll
+*.exe
+*.o
+*.a
