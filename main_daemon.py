@@ -319,7 +319,7 @@ class DynamicModuleManager:
             
             # Fallback: använd legacy modules om inga groups är definierade
             if not active_modules and self.legacy_modules:
-                active_modules = [name for name, config in self.legacy_modules.items() if config.get('enabled', False)]
+                active_modules = [name for name, config in self.legacy_modules.items() if isinstance(config, dict) and config.get('enabled', False)]
                 self.logger.info("🔄 Använder legacy modules (inga groups definierade)")
             
             self.logger.info(f"🎯 Aktiva moduler: {active_modules}")

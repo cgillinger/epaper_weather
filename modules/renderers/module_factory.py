@@ -13,6 +13,7 @@ import logging
 from typing import Dict, Optional, Callable, Any
 from .base_renderer import ModuleRenderer, LegacyModuleRenderer
 from .precipitation_renderer import PrecipitationRenderer
+from .wind_renderer import WindRenderer
 
 class ModuleFactory:
     """
@@ -34,8 +35,8 @@ class ModuleFactory:
         # Registry för renderer-klasser
         self._renderer_registry = {
             'precipitation_module': PrecipitationRenderer,
+            'wind_module': WindRenderer,
             # Framtida moduler läggs till här:
-            # 'wind_module': WindRenderer,
             # 'uv_module': UVRenderer,
             # 'air_quality_module': AirQualityRenderer,
         }

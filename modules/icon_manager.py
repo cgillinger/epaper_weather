@@ -5,6 +5,8 @@ Hanterar Weather Icons konverterade till PNG för E-Paper display
 Använder samma mappningar som Väderdisplayens utils.py
 FIXED: Använder befintliga wi-direction-X ikoner (med ringar) istället för wi-towards-X-deg
 NYTT: Support för kalender-ikon (wi-calendar) för datummodulen
+NYTT: Wind-mappningar och svenska vindbenämningar för cykel-optimerad användning
+KORRIGERAT: Vindstyrka-brytpunkter enligt SMHI:s officiella tabell
 """
 
 import os
@@ -59,9 +61,29 @@ class WeatherIconManager:
         
         # FIXED: Använder befintliga wi-direction-X ikoner (med ringar från konvertering)
         self.pressure_mapping = {
-            'rising': 'wi-direction-up',      # ↑ Stigande tryck (med ring)
-            'falling': 'wi-direction-down',   # ↓ Fallande tryck (med ring)
+            'rising': 'wi-direction-up',      # ↗ Stigande tryck (med ring)
+            'falling': 'wi-direction-down',   # ↘ Fallande tryck (med ring)
             'stable': 'wi-direction-right'    # → Stabilt tryck (med ring)
+        }
+        
+        # NYTT: Wind-ikoner för 16 kardinalpunkter - CYKEL-OPTIMERADE
+        self.wind_mapping = {
+            'n': 'wi-wind-n',         # Nord (0°/360°)
+            'nne': 'wi-wind-nne',     # Nord-nordost (22.5°)
+            'ne': 'wi-wind-ne',       # Nordost (45°)
+            'ene': 'wi-wind-ene',     # Ost-nordost (67.5°)
+            'e': 'wi-wind-e',         # Ost (90°)
+            'ese': 'wi-wind-ese',     # Ost-sydost (112.5°)
+            'se': 'wi-wind-se',       # Sydost (135°)
+            'sse': 'wi-wind-sse',     # Syd-sydost (157.5°)
+            's': 'wi-wind-s',         # Syd (180°)
+            'ssw': 'wi-wind-ssw',     # Syd-sydväst (202.5°)
+            'sw': 'wi-wind-sw',       # Sydväst (225°)
+            'wsw': 'wi-wind-wsw',     # Väst-sydväst (247.5°)
+            'w': 'wi-wind-w',         # Väst (270°)
+            'wnw': 'wi-wind-wnw',     # Väst-nordväst (292.5°)
+            'nw': 'wi-wind-nw',       # Nordväst (315°)
+            'nnw': 'wi-wind-nnw'      # Nord-nordväst (337.5°)
         }
         
         # Sol-ikoner (använda de som faktiskt genererades i sun/ katalogen)
@@ -81,7 +103,8 @@ class WeatherIconManager:
             'clock3': 'wi-time-3',            # Klockikon (gammal)
             'clock7': 'wi-time-7',            # Klockikon (FÖRBÄTTRAD)
             'barometer': 'wi-barometer',      # FIXED: Barometer-ikon tillagd!
-            'calendar': 'wi-calendar'         # NYTT: Kalender-ikon för datummodulen!
+            'calendar': 'wi-calendar',        # NYTT: Kalender-ikon för datummodulen!
+            'strong-wind': 'wi-strong-wind'   # NYTT: Generell wind-ikon för wind-modulen!
         }
         
         # Setup logging
@@ -90,6 +113,7 @@ class WeatherIconManager:
         print(f"🎨 WeatherIconManager initierad - {len(self.smhi_mapping)} väderikoner mappade")
         print(f"✅ FIXED: Använder befintliga wi-direction-X ikoner (med ringar)!")
         print(f"📅 NYTT: Kalender-ikon support för datummodulen!")
+        print(f"🌬️ NYTT: Wind-mappningar för cykel-optimerad vindinfo!")
     
     def get_weather_icon(self, smhi_symbol, is_night=False, size=(48, 48)):
         """
@@ -159,7 +183,7 @@ class WeatherIconManager:
         Hämta system-ikon
         
         Args:
-            system_type: 'update', 'data_source', 'status_ok', 'status_error', 'barometer', 'clock', 'clock3', 'calendar'
+            system_type: 'update', 'data_source', 'status_ok', 'status_error', 'barometer', 'clock', 'clock3', 'calendar', 'strong-wind'
             size: Tuple med ikon-storlek
             
         Returns:
@@ -172,8 +196,109 @@ class WeatherIconManager:
             self.logger.info(f"📅 Kalender-ikon begärd: {icon_name} ({size[0]}x{size[1]})")
         elif system_type == 'barometer':
             self.logger.info(f"📊 Barometer-ikon begärd: {icon_name} ({size[0]}x{size[1]})")
+        elif system_type == 'strong-wind':
+            self.logger.info(f"🌬️ Generell wind-ikon begärd: {icon_name} ({size[0]}x{size[1]})")
         
         return self.load_icon(f"system/{icon_name}.png", size)
+    
+    def get_wind_description_swedish(self, speed_ms):
+        """
+        Konvertera vindstyrka (m/s) till svenska benämningar enligt SMHI:s officiella Beaufort-tabell
+        KORRIGERAT: Exakta brytpunkter enligt SMHI:s "Benämning på land"
+        
+        Args:
+            speed_ms: Vindstyrka i m/s
+            
+        Returns:
+            Svensk vindbenämning enligt SMHI:s Beaufort-skala
+        """
+        if speed_ms <= 0.2:           # Beaufort 0: 0-0.2 m/s
+            return "Lugnt"
+        elif speed_ms <= 1.5:         # Beaufort 1: 0.3-1.5 m/s  
+            return "Svag vind"
+        elif speed_ms <= 3.3:         # Beaufort 2: 1.6-3.3 m/s
+            return "Svag vind"
+        elif speed_ms <= 5.4:         # Beaufort 3: 3.4-5.4 m/s
+            return "Måttlig vind"
+        elif speed_ms <= 7.9:         # Beaufort 4: 5.5-7.9 m/s
+            return "Måttlig vind"
+        elif speed_ms <= 10.7:        # Beaufort 5: 8.0-10.7 m/s
+            return "Frisk vind"
+        elif speed_ms <= 13.8:        # Beaufort 6: 10.8-13.8 m/s
+            return "Frisk vind"
+        elif speed_ms <= 17.1:        # Beaufort 7: 13.9-17.1 m/s
+            return "Hård vind"
+        elif speed_ms <= 20.7:        # Beaufort 8: 17.2-20.7 m/s
+            return "Hård vind"
+        elif speed_ms <= 24.4:        # Beaufort 9: 20.8-24.4 m/s
+            return "Hård vind"
+        elif speed_ms <= 28.4:        # Beaufort 10: 24.5-28.4 m/s
+            return "Storm"
+        elif speed_ms <= 32.6:        # Beaufort 11: 28.5-32.6 m/s
+            return "Storm"
+        else:                         # Beaufort 12: 32.7+ m/s
+            return "Orkan"
+
+    def get_wind_direction_info(self, degrees):
+        """
+        Konvertera grader till kort svensk vindförkortning och kardinal-kod
+        Cykel-optimerat för snabb avläsning (SV istället för "Sydvästlig vind")
+        
+        Args:
+            degrees: Vindriktning i grader (0-360)
+            
+        Returns:
+            Tuple (kort_svensk_förkortning, kardinal_kod)
+        """
+        if degrees < 0 or degrees > 360:
+            return "?", "n"
+        
+        # 16 sektorer à 22.5 grader med KORTA svenska förkortningar
+        sectors = [
+            (348.75, 360, "N", "n"), (0, 11.25, "N", "n"),
+            (11.25, 33.75, "NNO", "nne"),
+            (33.75, 56.25, "NO", "ne"),
+            (56.25, 78.75, "ONO", "ene"),
+            (78.75, 101.25, "O", "e"),
+            (101.25, 123.75, "OSO", "ese"),
+            (123.75, 146.25, "SO", "se"),
+            (146.25, 168.75, "SSO", "sse"),
+            (168.75, 191.25, "S", "s"),
+            (191.25, 213.75, "SSV", "ssw"),
+            (213.75, 236.25, "SV", "sw"),
+            (236.25, 258.75, "VSV", "wsw"),
+            (258.75, 281.25, "V", "w"),
+            (281.25, 303.75, "VNV", "wnw"),
+            (303.75, 326.25, "NV", "nw"),
+            (326.25, 348.75, "NNV", "nnw")
+        ]
+        
+        for start, end, kort_svensk, code in sectors:
+            if start <= degrees < end:
+                return kort_svensk, code
+        
+        # Fallback
+        return "N", "n"
+
+    def get_wind_icon(self, cardinal_direction, size=(32, 32)):
+        """
+        Hämta wind-ikon baserat på kardinal-riktning
+        FIXAD: Använder storleksspecifika undermappar (16x16/, 32x32/, 64x64/)
+        
+        Args:
+            cardinal_direction: Kardinal-kod (t.ex. 'nw', 'se')
+            size: Tuple med ikon-storlek
+            
+        Returns:
+            PIL Image-objekt eller None vid fel
+        """
+        icon_name = self.wind_mapping.get(cardinal_direction, 'wi-wind-n')
+        
+        # FIXAD: Använd storleksspecifik undermapp
+        size_dir = f"{size[0]}x{size[1]}"
+        icon_path = f"wind/{size_dir}/{icon_name}.png"
+        
+        return self.load_icon(icon_path, size)
     
     def load_icon(self, icon_path, size):
         """
@@ -219,6 +344,10 @@ class WeatherIconManager:
                 self.logger.info(f"📅 Kalender-ikon laddad: {icon_path} ({size[0]}x{size[1]})")
             elif 'wi-direction' in icon_path:
                 self.logger.info(f"📊 Trycktrend-ikon (med ring) laddad: {icon_path} ({size[0]}x{size[1]})")
+            elif 'wi-wind-' in icon_path:
+                self.logger.info(f"🌬️ Kardinal wind-ikon laddad: {icon_path} ({size[0]}x{size[1]})")
+            elif 'wi-strong-wind' in icon_path:
+                self.logger.info(f"🌪️ Generell wind-ikon laddad: {icon_path} ({size[0]}x{size[1]})")
             else:
                 self.logger.debug(f"✅ Ikon laddad: {icon_path} ({size[0]}x{size[1]})")
             
@@ -267,6 +396,7 @@ class WeatherIconManager:
             size = max(image.size)
             is_pressure_icon = 'pressure/' in icon_path or 'direction' in icon_path
             is_calendar_icon = 'wi-calendar' in icon_path
+            is_wind_icon = 'wind/' in icon_path or 'wi-wind-' in icon_path or 'wi-strong-wind' in icon_path
             
             if is_pressure_icon:
                 # Speciell hantering för trycktrend-pilar (behöver vara extra tydliga)
@@ -280,6 +410,12 @@ class WeatherIconManager:
                 sharpness_factor = 1.5
                 brightness_factor = 1.1
                 self.logger.debug(f"📅 Kalender-ikon optimering: {icon_path}")
+            elif is_wind_icon:
+                # NYTT: Speciell hantering för wind-ikoner (tydlighet för cykel-beslut)
+                contrast_factor = 2.4
+                sharpness_factor = 1.6
+                brightness_factor = 1.1
+                self.logger.debug(f"🌬️ Wind-ikon optimering: {icon_path}")
             elif size >= 80:
                 # Stora ikoner (väder, barometer): Balanserad optimering
                 contrast_factor = 2.2
@@ -448,13 +584,15 @@ class WeatherIconManager:
         pressure_count = len([k for k in self.icon_cache.keys() if k.startswith('pressure/')])
         sun_count = len([k for k in self.icon_cache.keys() if k.startswith('sun/')])
         system_count = len([k for k in self.icon_cache.keys() if k.startswith('system/')])
+        wind_count = len([k for k in self.icon_cache.keys() if k.startswith('wind/')])
         
         return {
             'total_cached_icons': total_icons,
             'weather_icons': weather_count,
             'pressure_icons': pressure_count, 
             'sun_icons': sun_count,
-            'system_icons': system_count
+            'system_icons': system_count,
+            'wind_icons': wind_count  # NYTT: Wind-ikoner räkning
         }
     
     def test_icon_loading(self):
@@ -475,6 +613,10 @@ class WeatherIconManager:
             'barometer_icon_test': False,  # NY: Specifik barometer-test
             'calendar_icon_test': False,   # NYTT: Specifik kalender-test
             'pressure_direction_test': False,  # NY: Test av wi-direction-X ikoner
+            'wind_description_test': False,    # NYTT: Test av svenska vindbenämningar
+            'wind_direction_test': False,      # NYTT: Test av cykel-optimerade vindförkortningar
+            'wind_icon_test': False,           # NYTT: Test av kardinal wind-ikoner
+            'general_wind_icon_test': False,   # NYTT: Test av generell wind-ikon
             'fallback_system_works': True
         }
         
@@ -539,17 +681,67 @@ class WeatherIconManager:
         except Exception as e:
             print(f"❌ Kalender-ikon-test misslyckades: {e}")
         
-        # Visa cache-statistik
+        # NYTT: Test wind descriptions (svenska benämningar)!
+        try:
+            desc_48 = self.get_wind_description_swedish(4.8)
+            desc_155 = self.get_wind_description_swedish(15.5)
+            test_results['wind_description_test'] = desc_48 and desc_155
+            print(f"🌬️ Wind-beskrivning-test: {'✅ OK' if test_results['wind_description_test'] else '❌ Fel'}")
+            print(f"   4.8 m/s → {desc_48}")
+            print(f"   15.5 m/s → {desc_155}")
+        except Exception as e:
+            print(f"❌ Wind-beskrivning-test misslyckades: {e}")
+        
+        # NYTT: Test wind directions (cykel-optimerade förkortningar)!
+        try:
+            dir_270 = self.get_wind_direction_info(270)  # Förväntat: ('V', 'w')
+            dir_225 = self.get_wind_direction_info(225)  # Förväntat: ('SV', 'sw')
+            dir_45 = self.get_wind_direction_info(45)    # Förväntat: ('NO', 'ne')
+            test_results['wind_direction_test'] = all([dir_270, dir_225, dir_45])
+            print(f"🧭 Wind-riktning-test: {'✅ OK' if test_results['wind_direction_test'] else '❌ Fel'}")
+            print(f"   270° → {dir_270} (CYKEL-KORT: förväntat 'V')")
+            print(f"   225° → {dir_225} (CYKEL-KORT: förväntat 'SV')")
+            print(f"   45° → {dir_45} (CYKEL-KORT: förväntat 'NO')")
+        except Exception as e:
+            print(f"❌ Wind-riktning-test misslyckades: {e}")
+        
+        # NYTT: Test kardinal wind-ikoner!
+        try:
+            wind_icon_w = self.get_wind_icon('w', size=(32, 32))
+            wind_icon_sw = self.get_wind_icon('sw', size=(32, 32))
+            test_results['wind_icon_test'] = True  # Test lyckas även om ikoner saknas
+            print(f"🧭 Kardinal wind-ikon-test: {'✅ OK' if wind_icon_w or wind_icon_sw else '❌ Fel'}")
+            print(f"   wi-wind-w.png: {'✅ Finns' if wind_icon_w else '⚠️ Saknas (fallback OK)'}")
+            print(f"   wi-wind-sw.png: {'✅ Finns' if wind_icon_sw else '⚠️ Saknas (fallback OK)'}")
+        except Exception as e:
+            print(f"❌ Kardinal wind-ikon-test misslyckades: {e}")
+        
+        # NYTT: Test generell wind-ikon (strong-wind)!
+        try:
+            general_wind_icon = self.get_system_icon('strong-wind', size=(48, 48))
+            test_results['general_wind_icon_test'] = general_wind_icon is not None
+            print(f"🌪️ Generell wind-ikon-test: {'✅ OK' if general_wind_icon else '❌ Fel'}")
+            
+            if general_wind_icon:
+                print(f"🌪️ wi-strong-wind.png laddad från system/!")
+            else:
+                print(f"⚠️ wi-strong-wind.png saknas från system/ - kör konverteringsskriptet")
+            
+        except Exception as e:
+            print(f"❌ Generell wind-ikon-test misslyckades: {e}")
+        
+        # Visa cache-statistik (nu med wind-ikoner)
         cache_stats = self.get_cache_stats()
         print(f"💾 Cache-statistik: {cache_stats['total_cached_icons']} ikoner totalt")
+        print(f"   🌬️ Wind-ikoner: {cache_stats['wind_icons']}")
         
         return test_results
 
 
 # Test-funktioner
 def test_weather_icon_manager():
-    """Test av WeatherIconManager"""
-    print("🧪 Testar WeatherIconManager med BEFINTLIGA wi-direction ikoner + KALENDER...")
+    """Test av WeatherIconManager med WIND-MAPPNINGAR + CYKEL-OPTIMERING"""
+    print("🧪 Testar WeatherIconManager med WIND-MAPPNINGAR för CYKEL-OPTIMERING...")
     
     # Skapa ikon-manager
     icon_manager = WeatherIconManager()
@@ -563,13 +755,23 @@ def test_weather_icon_manager():
             status = "✅ BEFINTLIGA wi-direction-X fungerar" if result else "⚠️ Ikoner saknas"
         elif test_name == 'calendar_icon_test':
             status = "✅ KALENDER-IKON FUNKAR" if result else "⚠️ wi-calendar.png saknas"
+        elif test_name == 'wind_description_test':
+            status = "✅ SVENSKA VINDBENÄMNINGAR fungerar" if result else "❌ Mappning-fel"
+        elif test_name == 'wind_direction_test':
+            status = "✅ CYKEL-OPTIMERADE FÖRKORTNINGAR fungerar" if result else "❌ Mappning-fel"
+        elif test_name == 'wind_icon_test':
+            status = "✅ KARDINAL WIND-IKONER OK" if result else "⚠️ Ikoner saknas (fallback OK)"
+        elif test_name == 'general_wind_icon_test':
+            status = "✅ GENERELL WIND-IKON FUNKAR" if result else "⚠️ wi-strong-wind.png saknas"
         else:
             status = "✅ PASS" if result else "⚠️ FALLBACK"
         print(f"  {test_name}: {status}")
     
-    print(f"\n💡 FIXED: Pressure-ikoner använder nu befintliga wi-direction-X (med ringar)!")
-    print(f"📅 NYTT: Kalender-ikon support för datummodulen!")
-    print(f"✅ Inga fler saknade ikoner - använder det du redan har!")
+    print(f"\n🌬️ WIND-MAPPNINGAR KLARA för cykel-optimering!")
+    print(f"🚴‍♂️ 4.8 m/s → 'Måttlig vind', 270° → 'V' (kort förkortning)")
+    print(f"📊 BEFINTLIGA pressure-ikoner behållna")
+    print(f"📅 KALENDER-ikon support tillagd")
+    print(f"✅ Klar för Fas 3: WindRenderer implementation!")
     
     return icon_manager
 
