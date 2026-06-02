@@ -1,6 +1,8 @@
 # E-Paper Väderapp - Komplett Projekt med Dynamic Module System
 **Raspberry Pi 3B + Waveshare 4.26" E-Paper HAT (800×480px)**
 
+> Det här är ett personligt hobbyprojekt som jag byggt för eget bruk och lagt upp ifall det är till nytta för någon annan. Jag jobbar på det på fritiden, så issues och PR:ar är välkomna men svar kan dröja. Använd på egen risk.
+
 ## 🏆 Projektöversikt
 
 Avancerad väderstation med E-Paper display som kombinerar lokala Netatmo-sensorer med SMHI väderdata, **SMHI Observations från Observatorielunden** och exakta soltider. Systemet använder ett **Dynamic Module System** med trigger-baserade moduler, högkvalitativa Weather Icons och intelligent rendering pipeline för professionell presentation.
