@@ -1,3 +1,5 @@
+> ⚠️ **Ersatt / Superseded:** Detta projekt har ersatts av [eink_weather_2](https://github.com/cgillinger/eink_weather_2) — samma väderstation med multi-provider-stöd (SMHI + YR), webbversion och aktivt underhåll. Det här repot är arkiverat och skrivskyddat, bevarat för historiken.
+
 # E-Paper Väderapp - Komplett Projekt med Dynamic Module System
 **Raspberry Pi 3B + Waveshare 4.26" E-Paper HAT (800×480px)**
 
